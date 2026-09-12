@@ -19,17 +19,17 @@ export const Button = ({
   };
 
   const sizeClasses = {
-    sm: 'px-3 py-1.5 text-xs rounded-lg gap-1.5',
-    md: 'px-4 py-2 text-xs sm:text-sm rounded-xl gap-2',
-    lg: 'px-6 py-3 text-sm sm:text-base rounded-xl gap-2.5'
+    sm: 'px-2.5 py-1 text-[11px] font-mono rounded-xs gap-1.5',
+    md: 'px-4 py-2 text-xs font-mono rounded-xs gap-2',
+    lg: 'px-5 py-2.5 text-xs sm:text-sm font-mono rounded-xs gap-2.5'
   };
 
   const variantClasses = {
-    primary: 'theme-button-primary font-bold shadow-lg',
-    secondary: 'bg-white/10 hover:bg-white/15 text-white border border-white/15 font-semibold',
-    outline: 'border border-white/20 text-neutral-300 hover:text-white hover:bg-white/5 font-semibold',
-    danger: 'bg-red-600/80 hover:bg-red-600 text-white border border-red-500/50 font-bold',
-    ghost: 'text-neutral-400 hover:text-white hover:bg-white/5 font-medium'
+    primary: 'rpg-button-primary font-black uppercase tracking-wider shadow-lg active:translate-y-0.5',
+    secondary: 'rpg-button font-bold uppercase tracking-wider active:translate-y-0.5',
+    outline: 'border border-neutral-700 bg-neutral-950/80 text-neutral-300 hover:text-white hover:border-neutral-500 font-bold uppercase tracking-wider active:translate-y-0.5',
+    danger: 'bg-red-950/90 hover:bg-red-900 text-red-200 border border-red-700 font-black uppercase tracking-wider shadow-md active:translate-y-0.5',
+    ghost: 'text-neutral-400 hover:text-white hover:bg-white/5 font-bold uppercase tracking-wider'
   };
 
   return (

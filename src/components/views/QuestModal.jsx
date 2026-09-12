@@ -41,44 +41,44 @@ export const QuestModal = ({ isOpen, onClose, onCreateQuest }) => {
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title={`Forge New ${themeConfig.terminology.quest}`}>
-      <form onSubmit={handleSubmit} className="space-y-4">
+    <Modal isOpen={isOpen} onClose={onClose} title={`ENLIST NEW ${themeConfig.terminology.quest}`}>
+      <form onSubmit={handleSubmit} className="space-y-4 font-mono">
         <div>
-          <label className="block text-xs font-bold text-neutral-300 uppercase tracking-wider mb-1">
-            Quest Objective
+          <label className="block text-[10px] font-bold text-neutral-400 uppercase tracking-widest mb-1">
+            CONTRACT OBJECTIVE
           </label>
           <input
             type="text"
             required
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            placeholder="e.g., Code API endpoints for 60 min, Run 5k, Meditate..."
-            className="w-full px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/15 text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-emerald-400 text-sm"
+            placeholder="e.g., SHIP BACKEND API, SPRINT 5KM, RUNIC MEDITATION..."
+            className="w-full px-3 py-2 bg-black/60 border border-neutral-700 text-white placeholder-neutral-600 text-xs focus:outline-none focus:border-amber-400 rounded-sm"
           />
         </div>
 
         <div>
-          <label className="block text-xs font-bold text-neutral-300 uppercase tracking-wider mb-1">
-            Lore & Notes (Optional)
+          <label className="block text-[10px] font-bold text-neutral-400 uppercase tracking-widest mb-1">
+            LORE & BRIEFING (OPTIONAL)
           </label>
           <textarea
             rows="2"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            placeholder="Specific deliverables or conditions to achieve victory..."
-            className="w-full px-3.5 py-2 rounded-xl bg-black/40 border border-white/15 text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-emerald-400 text-sm resize-none"
+            placeholder="Specific deliverables or tactical conditions..."
+            className="w-full px-3 py-2 bg-black/60 border border-neutral-700 text-white placeholder-neutral-600 text-xs focus:outline-none focus:border-amber-400 rounded-sm resize-none"
           />
         </div>
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-bold text-neutral-300 uppercase tracking-wider mb-1">
-              Category
+            <label className="block text-[10px] font-bold text-neutral-400 uppercase tracking-widest mb-1">
+              DOMAIN
             </label>
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              className="w-full px-3 py-2 rounded-xl bg-neutral-900 border border-white/15 text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
+              className="w-full px-3 py-2 bg-neutral-900 border border-neutral-700 text-white text-xs focus:outline-none focus:border-amber-400 rounded-sm"
             >
               <option value="work">Work & Code</option>
               <option value="study">Study & Mind</option>
@@ -89,13 +89,13 @@ export const QuestModal = ({ isOpen, onClose, onCreateQuest }) => {
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-neutral-300 uppercase tracking-wider mb-1">
-              Difficulty
+            <label className="block text-[10px] font-bold text-neutral-400 uppercase tracking-widest mb-1">
+              DIFFICULTY RATING
             </label>
             <select
               value={difficulty}
               onChange={(e) => setDifficulty(e.target.value)}
-              className="w-full px-3 py-2 rounded-xl bg-neutral-900 border border-white/15 text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
+              className="w-full px-3 py-2 bg-neutral-900 border border-neutral-700 text-white text-xs focus:outline-none focus:border-amber-400 rounded-sm"
             >
               <option value="easy">Easy (50 XP / 25g)</option>
               <option value="medium">Medium (100 XP / 50g)</option>
@@ -110,36 +110,36 @@ export const QuestModal = ({ isOpen, onClose, onCreateQuest }) => {
             id="isDaily"
             checked={isDaily}
             onChange={(e) => setIsDaily(e.target.checked)}
-            className="w-4 h-4 rounded border-neutral-700 bg-neutral-900 text-emerald-500 focus:ring-emerald-400 focus:ring-offset-0"
+            className="w-4 h-4 rounded-xs border-neutral-700 bg-neutral-900 text-amber-500 focus:ring-0"
           />
           <label htmlFor="isDaily" className="text-xs text-neutral-300 select-none cursor-pointer">
-            Recurring Daily Habit (builds streak counter)
+            RECURRING DAILY DISCIPLINE (BUILDS STREAK FORTRESS)
           </label>
         </div>
 
         {/* Expected Rewards summary banner */}
-        <div className="p-3 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between text-xs font-medium">
-          <span className="text-neutral-400">Authoritative Rewards:</span>
+        <div className="p-3 bg-black/60 border border-neutral-800 flex items-center justify-between text-xs rounded-sm">
+          <span className="text-neutral-500 text-[10px] uppercase">AUTHORITATIVE PAYOUT:</span>
           <div className="flex items-center gap-3 font-bold">
-            <span className="text-emerald-400">+{difficultyRewards[difficulty].xp} XP</span>
-            <span className="text-amber-400">+{difficultyRewards[difficulty].gold} Gold</span>
+            <span className="text-emerald-400">+{difficultyRewards[difficulty].xp} EXP</span>
+            <span className="text-amber-400">+{difficultyRewards[difficulty].gold} GOLD</span>
           </div>
         </div>
 
-        <div className="flex justify-end gap-3 pt-3 border-t border-white/10">
+        <div className="flex justify-end gap-3 pt-3 border-t border-neutral-800">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-neutral-300 text-xs font-semibold transition-colors"
+            className="rpg-button px-4 py-2 text-xs font-bold text-neutral-300 uppercase tracking-wider"
           >
-            Cancel
+            DISMISS
           </button>
           <button
             type="submit"
-            className="theme-button-primary px-5 py-2 text-xs font-bold flex items-center gap-1.5"
+            className="rpg-button-primary px-5 py-2 text-xs font-bold flex items-center gap-1.5 uppercase tracking-wider shadow-lg active:translate-y-0.5"
           >
             <PlusCircle className="w-4 h-4" />
-            <span>Engrave Quest</span>
+            <span>DISPATCH CONTRACT</span>
           </button>
         </div>
       </form>

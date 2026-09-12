@@ -36,19 +36,19 @@ export const Modal = ({ isOpen, onClose, title, children, maxWidth = 'max-w-lg' 
             role="dialog"
             aria-modal="true"
             aria-labelledby="modal-headline"
-            className={`theme-card relative w-full ${maxWidth} z-10 p-6 my-8 border border-white/20 rounded-2xl shadow-2xl overflow-hidden`}
+            className={`rpg-card relative w-full ${maxWidth} z-10 p-6 my-8 border border-neutral-700 shadow-2xl overflow-hidden`}
           >
             {/* Header */}
-            <div className="flex items-center justify-between pb-4 mb-4 border-b border-white/10">
-              <h2 id="modal-headline" className="text-xl font-bold text-white tracking-wide">
+            <div className="flex items-center justify-between pb-3.5 mb-4 border-b border-neutral-800">
+              <h2 id="modal-headline" className="text-lg font-bold text-white tracking-wide uppercase">
                 {title}
               </h2>
               <button
                 onClick={onClose}
-                className="p-1.5 rounded-lg text-neutral-400 hover:text-white hover:bg-white/10 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                className="p-1 rounded-sm text-neutral-400 hover:text-white bg-neutral-900 border border-neutral-800 hover:border-neutral-600 transition-colors"
                 aria-label="Close modal"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
 

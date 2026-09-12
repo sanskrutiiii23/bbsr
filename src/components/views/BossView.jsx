@@ -52,17 +52,18 @@ export const BossView = ({ boss, onAttackBoss, character }) => {
   return (
     <div className="space-y-6">
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-neutral-800 pb-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="px-2.5 py-0.5 rounded-full text-xs font-black uppercase tracking-wider bg-red-500/20 text-red-400 border border-red-500/30">
-              World Boss Raid
+            <span className="px-2 py-0.5 text-[10px] font-mono font-black uppercase tracking-widest bg-red-950/80 text-red-400 border border-red-800/80 flex items-center gap-1.5 rounded-sm shadow-sm">
+              <Skull className="w-3.5 h-3.5 text-red-500 animate-pulse" />
+              WORLD RAID ENCOUNTER
             </span>
-            <span className="text-xs text-neutral-400 font-semibold">
-              Authoritative Encounter
+            <span className="text-[11px] font-mono text-neutral-400">
+              SYNCHRONIZED BOSS PHASE
             </span>
           </div>
-          <h1 className={`text-2xl sm:text-3xl font-black text-white mt-1 tracking-wide ${themeConfig.fontHeading}`}>
+          <h1 className={`text-2xl sm:text-3xl font-black text-white mt-1 tracking-wide uppercase ${themeConfig.fontHeading}`}>
             {boss?.name}
           </h1>
           <p className="text-xs sm:text-sm text-neutral-400 mt-0.5">
@@ -70,25 +71,30 @@ export const BossView = ({ boss, onAttackBoss, character }) => {
           </p>
         </div>
 
-        {isEnraged && (
-          <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-red-600/20 border border-red-500 text-red-300 text-xs font-extrabold animate-pulse">
+        {isEnraged ? (
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-red-950/90 border border-red-600 text-red-300 text-xs font-mono font-black uppercase tracking-wider animate-pulse shadow-[0_0_15px_rgba(220,38,38,0.4)]">
             <ShieldAlert className="w-4 h-4 text-red-400" />
-            <span>ENRAGED PHASE (40% HP)</span>
+            <span>ENRAGED STATE [CRITICAL PHASE]</span>
+          </div>
+        ) : (
+          <div className="flex items-center gap-1.5 px-3 py-1.5 bg-neutral-900 border border-neutral-700 text-neutral-400 text-xs font-mono uppercase">
+            <span>DIFFICULTY:</span>
+            <span className="text-amber-400 font-bold">LEGENDARY RAID</span>
           </div>
         )}
       </div>
 
       {/* Main Boss Raid Arena Card */}
-      <div className="theme-card p-6 md:p-8 flex flex-col items-center relative overflow-hidden">
+      <div className="rpg-card p-6 md:p-8 flex flex-col items-center relative overflow-hidden">
         {/* Boss HP Bar */}
         <div className="w-full max-w-xl mb-6 z-10">
-          <div className="flex justify-between items-center text-xs font-black mb-1.5">
+          <div className="flex justify-between items-center text-xs font-mono font-bold mb-1.5">
             <span className="text-red-400 uppercase tracking-widest flex items-center gap-1.5">
               <Skull className="w-4 h-4" />
-              Boss Vitality
+              Boss Vitality [Phase 1/1]
             </span>
-            <span className="text-neutral-200">
-              {currentHp} / {maxHp} HP ({hpPercent}%)
+            <span className="text-neutral-300">
+              {currentHp} / {maxHp} HP <strong className="text-amber-400">({hpPercent}%)</strong>
             </span>
           </div>
           <ProgressBar
@@ -208,41 +214,42 @@ export const BossView = ({ boss, onAttackBoss, character }) => {
 
         {/* Victory Screen if Defeated */}
         {isDefeated ? (
-          <div className="p-4 rounded-2xl bg-amber-500/20 border border-amber-500/40 text-center max-w-md z-10 animate-bounce">
-            <Award className="w-10 h-10 text-amber-400 mx-auto mb-1" />
-            <h3 className="text-lg font-bold text-white">BOSS SLAIN! VICTORY!</h3>
-            <p className="text-xs text-amber-200 mt-1">
-              Authoritative rewards credited: +250 Koban Gold & +10 Arcane Gems!
+          <div className="p-5 bg-amber-500/10 border-2 border-amber-500 text-center max-w-md z-10 animate-bounce rounded-md shadow-[0_0_30px_rgba(245,158,11,0.3)]">
+            <Award className="w-10 h-10 text-amber-400 mx-auto mb-1.5" />
+            <h3 className={`text-xl font-black text-white uppercase tracking-wider ${themeConfig.fontHeading}`}>WORLD BOSS SLAIN</h3>
+            <p className="text-xs font-mono text-amber-300 mt-1">
+              AUTHORITATIVE REWARD CREDITED: +250 GOLD & +10 ARCANE GEMS
             </p>
           </div>
         ) : (
           /* Combat Controls */
-          <div className="flex flex-col sm:flex-row items-center gap-3 z-10 mt-2">
+          <div className="flex flex-col sm:flex-row items-center gap-4 z-10 mt-3">
             <button
               onClick={handleDirectAttack}
               disabled={isAttacking || isDefeated}
-              className="theme-button-primary px-6 py-3 text-sm font-extrabold flex items-center gap-2 shadow-xl hover:scale-105 active:scale-95 disabled:opacity-50"
+              className="rpg-button-primary px-7 py-3.5 text-xs font-mono font-black uppercase tracking-wider flex items-center gap-2.5 shadow-2xl active:translate-y-0.5 disabled:opacity-50"
             >
               <Sword className="w-4 h-4 stroke-[2.5]" />
-              <span>Direct Focus Strike (-85 HP)</span>
+              <span>DIRECT FOCUS STRIKE [-85 HP]</span>
             </button>
-            <span className="text-xs text-neutral-400 font-medium">
-              Tip: Completing quests on your Quest Board deals 100% of Quest XP as boss damage!
+            <span className="text-[11px] font-mono text-neutral-400">
+              ⚡ INFO: Completing quests deals 100% Quest EXP directly to the boss!
             </span>
           </div>
         )}
       </div>
 
       {/* Battle Log Box */}
-      <div className="theme-card p-5">
-        <h4 className="text-xs font-bold uppercase tracking-wider text-neutral-400 mb-3 flex items-center gap-2">
-          <Zap className="w-4 h-4 text-amber-400" />
-          Real-Time Battle Feed
+      <div className="rpg-card p-5">
+        <h4 className="text-[10px] font-mono font-bold uppercase tracking-widest text-neutral-400 mb-3 flex items-center gap-2 border-b border-neutral-800 pb-2">
+          <Zap className="w-3.5 h-3.5 text-amber-400" />
+          <span>TACTICAL COMBAT TELEMETRY & FEED</span>
         </h4>
-        <div className="space-y-1.5 font-mono text-xs text-neutral-300">
+        <div className="space-y-1 font-mono text-xs text-neutral-300 bg-black/50 p-3 rounded-md border border-neutral-800">
           {battleLog.map((log, index) => (
-            <div key={index} className="py-1 border-b border-white/5 last:border-0">
-              {log}
+            <div key={index} className="py-1 border-b border-neutral-900 last:border-0 flex items-center gap-2">
+              <span className="text-[10px] text-neutral-600">[{index + 1}]</span>
+              <span>{log}</span>
             </div>
           ))}
         </div>

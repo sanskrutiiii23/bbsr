@@ -1,11 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTheme } from '../../context/ThemeContext';
 import { THEMES } from '../../themes/definitions';
-import { Sparkles, Sword, Building2, Check, Palette } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Sparkles, Sword, Building2, Check, Palette, Lock, AlertCircle } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
-export const ThemeSelector = ({ isOpen, onClose }) => {
+export const ThemeSelector = ({ isOpen, onClose, playerLevel = 1 }) => {
   const { currentTheme, switchTheme, allThemes } = useTheme();
+  const [lockedNotice, setLockedNotice] = useState(null);
 
   const getThemeVisual = (themeId) => {
     switch (themeId) {
@@ -48,6 +49,17 @@ export const ThemeSelector = ({ isOpen, onClose }) => {
     }
   };
 
+  const handleSelectTheme = (theme) => {
+    const isLocked = playerLevel < (theme.unlockLevel || 1);
+    if (isLocked) {
+      setLockedNotice(`🔒 ${theme.name} is locked! Advance along the Adventure Track to Level ${theme.unlockLevel} to unlock this realm.`);
+      setTimeout(() => setLockedNotice(null), 3000);
+      return;
+    }
+    switchTheme(theme.id);
+    onClose();
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -64,23 +76,38 @@ export const ThemeSelector = ({ isOpen, onClose }) => {
         initial={{ opacity: 0, scale: 0.95, y: 10 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 10 }}
-        className="relative z-10 w-full max-w-2xl bg-neutral-900 border border-neutral-700 rounded-2xl p-6 shadow-2xl overflow-hidden"
+        className="relative z-10 w-full max-w-2xl rpg-card p-6 shadow-2xl overflow-hidden border border-neutral-700"
       >
+        {/* Locked Alert Notice */}
+        <AnimatePresence>
+          {lockedNotice && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="mb-4 p-3 bg-amber-500/10 border border-amber-500/40 text-amber-300 text-xs font-mono font-bold flex items-center gap-2 rounded-sm"
+            >
+              <AlertCircle className="w-4 h-4 text-amber-400 flex-shrink-0" />
+              <span>{lockedNotice}</span>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         <div className="flex items-center justify-between pb-4 border-b border-neutral-800 mb-6">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400">
+            <div className="p-2.5 rounded-sm bg-amber-500/10 border border-amber-500/30 text-amber-400">
               <Palette className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-white tracking-wide">Theme Matrix</h2>
-              <p className="text-xs text-neutral-400">Select a master theme designed by Tech Member 2</p>
+              <h2 className="text-lg font-bold text-white tracking-wide uppercase">Planar Realm Matrix</h2>
+              <p className="text-xs font-mono text-neutral-400">LEVEL-GATED REALM PROGRESSION • HERO LEVEL: <strong className="text-amber-400">LVL {playerLevel}</strong></p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="text-xs px-3 py-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-300 font-medium transition-colors"
+            className="rpg-button px-3.5 py-1.5 text-xs font-mono font-bold text-neutral-300 uppercase tracking-wider"
           >
-            Done
+            DISMISS [X]
           </button>
         </div>
 
@@ -89,63 +116,86 @@ export const ThemeSelector = ({ isOpen, onClose }) => {
           {Object.keys(allThemes).map((themeKey) => {
             const theme = allThemes[themeKey];
             const isSelected = currentTheme === theme.id;
+            const requiredLevel = theme.unlockLevel || 1;
+            const isLocked = playerLevel < requiredLevel;
             const visual = getThemeVisual(theme.id);
             const Icon = visual.icon;
 
             return (
               <button
                 key={theme.id}
-                onClick={() => {
-                  switchTheme(theme.id);
-                  onClose();
-                }}
-                className={`relative flex flex-col text-left rounded-xl p-4 transition-all duration-300 border overflow-hidden group ${
-                  isSelected
-                    ? 'border-white/80 ring-2 ring-white/30 shadow-xl scale-[1.02]'
-                    : 'border-white/10 hover:border-white/30 hover:scale-[1.01]'
-                } bg-gradient-to-b ${visual.gradient}`}
+                onClick={() => handleSelectTheme(theme)}
+                className={`relative flex flex-col text-left p-4 transition-all duration-200 border overflow-hidden group active:translate-y-0.5 ${
+                  isLocked
+                    ? 'opacity-55 bg-black/80 border-neutral-800 hover:border-amber-500/40 cursor-pointer'
+                    : isSelected
+                    ? 'border-amber-400 bg-neutral-900 ring-1 ring-amber-400/40 shadow-xl'
+                    : 'border-neutral-800 bg-neutral-950/80 hover:border-neutral-600'
+                }`}
+                style={{ clipPath: 'polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px))' }}
               >
-                {/* Active check pill */}
+                {/* Active check badge */}
                 {isSelected && (
-                  <div className="absolute top-3 right-3 flex items-center gap-1 px-2 py-0.5 rounded-full bg-white text-black text-[10px] font-extrabold tracking-wider">
+                  <div className="absolute top-2.5 right-2.5 flex items-center gap-1 px-1.5 py-0.5 bg-amber-400 text-neutral-950 text-[9px] font-mono font-black uppercase tracking-wider">
                     <Check className="w-3 h-3 stroke-[3]" />
                     ACTIVE
                   </div>
                 )}
 
-                {/* Tag */}
+                {/* Locked indicator badge */}
+                {isLocked && (
+                  <div className="absolute top-2.5 right-2.5 flex items-center gap-1 px-1.5 py-0.5 bg-amber-500/10 text-amber-300 border border-amber-500/30 text-[9px] font-mono font-bold tracking-wider">
+                    <Lock className="w-2.5 h-2.5" />
+                    LVL {requiredLevel}
+                  </div>
+                )}
+
+                {/* Tag & Unlock status */}
                 <div className="flex items-center gap-2 mb-3">
-                  <span className="text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded bg-black/40 text-white/90 border border-white/10">
+                  <span className="text-[9px] font-mono font-bold uppercase tracking-widest px-1.5 py-0.5 bg-neutral-900 text-neutral-300 border border-neutral-700">
                     {visual.tag}
+                  </span>
+                  <span className="text-[10px] font-mono text-neutral-400">
+                    {theme.unlockRequirement}
                   </span>
                 </div>
 
                 {/* Theme Icon & Title */}
                 <div className="flex items-center gap-2.5 mb-1.5">
                   <div
-                    className="p-2 rounded-lg text-white"
-                    style={{ backgroundColor: `${visual.accentColor}25` }}
+                    className="p-2 rounded-sm text-white border border-white/10"
+                    style={{ backgroundColor: `${visual.accentColor}20` }}
                   >
-                    <Icon className="w-5 h-5" style={{ color: visual.accentColor }} />
+                    {isLocked ? (
+                      <Lock className="w-4 h-4 text-amber-400" />
+                    ) : (
+                      <Icon className="w-4 h-4" style={{ color: visual.accentColor }} />
+                    )}
                   </div>
-                  <h3 className="text-base font-bold text-white tracking-wide">
+                  <h3 className="text-sm font-bold text-white tracking-wide uppercase">
                     {theme.name}
                   </h3>
                 </div>
 
-                <p className="text-xs text-neutral-300/80 mb-4 line-clamp-1">
+                <p className="text-xs text-neutral-400 mb-4 line-clamp-1">
                   {visual.tagline}
                 </p>
 
-                {/* Micro Features list */}
-                <ul className="mt-auto space-y-1.5 pt-3 border-t border-white/10 text-[11px] text-neutral-300">
-                  {visual.features.map((feat, idx) => (
-                    <li key={idx} className="flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: visual.accentColor }} />
-                      <span>{feat}</span>
-                    </li>
-                  ))}
-                </ul>
+                {/* Micro Features or Lock Status */}
+                {isLocked ? (
+                  <div className="mt-auto pt-3 border-t border-neutral-800 text-[10px] font-mono text-amber-300/90">
+                    🔒 Progress to Level {requiredLevel} to unseal!
+                  </div>
+                ) : (
+                  <ul className="mt-auto space-y-1 pt-3 border-t border-neutral-800 text-[10px] font-mono text-neutral-400">
+                    {visual.features.map((feat, idx) => (
+                      <li key={idx} className="flex items-center gap-1.5">
+                        <span className="w-1 h-1 rounded-full" style={{ backgroundColor: visual.accentColor }} />
+                        <span>{feat}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </button>
             );
           })}

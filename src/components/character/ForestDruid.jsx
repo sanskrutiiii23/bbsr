@@ -133,20 +133,18 @@ export const ForestDruid = ({ action = 'idle' }) => {
         {/* Main Druid Body */}
         <motion.g variants={bodyVariants} animate={action}>
           {/* Flowing Leaf Mantle / Cape */}
-          <motion.path
-            d="M65 95 C 40 140, 50 195, 60 215 C 80 210, 120 210, 140 215 C 150 195, 160 140, 135 95 Z"
-            fill="#064e3b"
-            stroke="#047857"
-            strokeWidth="2"
-            animate={{
-              d: [
-                "M65 95 C 40 140, 50 195, 60 215 C 80 210, 120 210, 140 215 C 150 195, 160 140, 135 95 Z",
-                "M65 95 C 36 142, 47 197, 56 216 C 80 212, 120 212, 144 216 C 153 197, 164 142, 135 95 Z",
-                "M65 95 C 40 140, 50 195, 60 215 C 80 210, 120 210, 140 215 C 150 195, 160 140, 135 95 Z"
-              ]
-            }}
-            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-          />
+          <motion.g
+            animate={{ rotate: [-1.5, 1.5, -1.5], scaleX: [1, 1.03, 1] }}
+            transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+            style={{ transformOrigin: '100px 95px' }}
+          >
+            <path
+              d="M65 95 C 40 140, 50 195, 60 215 C 80 210, 120 210, 140 215 C 150 195, 160 140, 135 95 Z"
+              fill="#064e3b"
+              stroke="#047857"
+              strokeWidth="2"
+            />
+          </motion.g>
 
           {/* Robe Body */}
           <path
@@ -205,7 +203,7 @@ export const ForestDruid = ({ action = 'idle' }) => {
         <motion.g
           variants={staffVariants}
           animate={action}
-          style={{ originX: '145px', originY: '170px' }}
+          style={{ transformOrigin: '145px 170px' }}
         >
           {/* Staff Shaft */}
           <path

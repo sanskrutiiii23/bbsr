@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useTheme } from '../../context/ThemeContext';
 import { Badge } from '../shared/Badge';
-import { sound } from '../../utils/soundEffects';
-import { CheckCircle2, Circle, Flame, Coins, Zap, Trash2 } from 'lucide-react';
+import { sound, audioEngine } from '../../utils/soundEffects';
+import { CheckCircle2, Circle, Flame, Coins, Zap, Trash2, Star, ShieldCheck } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export const QuestCard = ({ quest, onComplete, onDelete }) => {
@@ -15,7 +15,7 @@ export const QuestCard = ({ quest, onComplete, onDelete }) => {
     setIsCompleting(true);
 
     try {
-      sound.playQuestComplete();
+      audioEngine.playQuestComplete(themeConfig.id);
       setRewardPopup({
         xp: quest.xp,
         gold: quest.gold,
@@ -34,14 +34,23 @@ export const QuestCard = ({ quest, onComplete, onDelete }) => {
     }
   };
 
+  const difficultyStars = {
+    easy: 1,
+    medium: 2,
+    hard: 3,
+    epic: 4
+  }[quest.difficulty] || 1;
+
   return (
     <motion.div
       layout
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.95 }}
-      className={`theme-card p-4 flex flex-col justify-between transition-all duration-300 relative group ${
-        quest.completed ? 'opacity-65 bg-black/20' : 'hover:-translate-y-0.5'
+      className={`theme-card p-4 sm:p-5 flex flex-col justify-between transition-all duration-200 relative group ${
+        quest.completed
+          ? 'opacity-60 bg-black/40 border-neutral-800'
+          : 'hover:-translate-y-1 hover:border-white/30'
       }`}
     >
       {/* Floating Reward Animation */}
@@ -49,10 +58,10 @@ export const QuestCard = ({ quest, onComplete, onDelete }) => {
         {rewardPopup && (
           <motion.div
             key={rewardPopup.id}
-            initial={{ opacity: 0, y: 0, scale: 0.7 }}
+            initial={{ opacity: 0, y: 5, scale: 0.8 }}
             animate={{ opacity: 1, y: -45, scale: 1.15 }}
             exit={{ opacity: 0 }}
-            className="absolute z-30 top-3 right-6 flex items-center gap-3 px-3 py-1.5 rounded-full bg-neutral-900 border border-amber-400/60 shadow-2xl text-xs font-black"
+            className="absolute z-30 top-2 right-4 flex items-center gap-3 px-3 py-1 rounded-sm bg-black border border-amber-400 text-xs font-black shadow-2xl"
           >
             <span className="text-emerald-400 flex items-center gap-1">
               +{rewardPopup.xp} {themeConfig.terminology.xp}
@@ -65,47 +74,54 @@ export const QuestCard = ({ quest, onComplete, onDelete }) => {
       </AnimatePresence>
 
       <div>
-        {/* Top Header: Category & Difficulty Badges */}
-        <div className="flex items-center justify-between gap-2 mb-2.5">
-          <div className="flex items-center gap-1.5 flex-wrap">
+        {/* Top Header: Category & Difficulty Stars */}
+        <div className="flex items-center justify-between gap-2 mb-3">
+          <div className="flex items-center gap-2">
             <Badge variant={quest.category} size="sm">
               {quest.category}
             </Badge>
-            <Badge variant={quest.difficulty} size="sm">
-              {quest.difficulty}
-            </Badge>
+
+            {/* Difficulty Rating Stars */}
+            <div className="flex items-center gap-0.5 text-amber-400" title={`Difficulty: ${quest.difficulty}`}>
+              {Array.from({ length: difficultyStars }).map((_, i) => (
+                <Star key={i} className="w-3 h-3 fill-amber-400 text-amber-400" />
+              ))}
+            </div>
+
             {quest.isDaily && (
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/15 text-blue-300 border border-blue-500/30">
-                Daily Habit
+              <span className="text-[9px] font-mono uppercase font-bold text-sky-300 bg-sky-950/60 px-2 py-0.5 rounded-sm border border-sky-500/30">
+                Daily Duty
               </span>
             )}
           </div>
 
           {quest.streak > 0 && (
-            <div className="flex items-center gap-1 text-[11px] font-bold text-orange-400 bg-orange-500/10 px-2 py-0.5 rounded-full border border-orange-500/20">
+            <div className="flex items-center gap-1 text-[10px] font-mono font-bold text-orange-400 bg-orange-950/40 px-2 py-0.5 rounded-sm border border-orange-500/30">
               <Flame className="w-3 h-3 fill-orange-500" />
-              <span>{quest.streak} streak</span>
+              <span>{quest.streak} STREAK</span>
             </div>
           )}
         </div>
 
         {/* Quest Title */}
-        <h4 className={`text-base font-bold text-white mb-1.5 ${quest.completed ? 'line-through text-neutral-400' : ''}`}>
+        <h4 className={`text-base font-bold text-white mb-1.5 leading-snug tracking-wide ${
+          quest.completed ? 'line-through text-neutral-400' : ''
+        }`}>
           {quest.title}
         </h4>
 
         {/* Description */}
         {quest.description && (
-          <p className="text-xs text-neutral-300/80 mb-3 line-clamp-2 leading-relaxed">
+          <p className="text-xs text-neutral-300/80 mb-4 line-clamp-2 leading-relaxed font-normal">
             {quest.description}
           </p>
         )}
       </div>
 
-      {/* Footer: Rewards & Complete Trigger */}
-      <div className="flex items-center justify-between pt-3 border-t border-white/10 mt-2">
+      {/* Footer: Tangible Reward Chips & Seal Action */}
+      <div className="flex items-center justify-between pt-3 border-t border-white/10 mt-auto">
         {/* Rewards pill */}
-        <div className="flex items-center gap-3 text-xs font-bold">
+        <div className="flex items-center gap-3 text-xs font-mono font-bold">
           <span className="text-emerald-400 flex items-center gap-1">
             <Zap className="w-3.5 h-3.5" />
             {quest.xp} XP
@@ -118,35 +134,35 @@ export const QuestCard = ({ quest, onComplete, onDelete }) => {
 
         {/* Actions */}
         <div className="flex items-center gap-2">
-          {onDelete && (
+          {onDelete && !quest.completed && (
             <button
               onClick={() => onDelete(quest.id)}
-              className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg text-neutral-500 hover:text-red-400 hover:bg-red-500/10 transition-all"
-              title="Delete Quest"
+              className="opacity-0 group-hover:opacity-100 p-1 rounded hover:text-red-400 text-neutral-500 transition-opacity"
+              title="Abandon Quest"
               aria-label="Delete quest"
             >
-              <Trash2 className="w-4 h-4" />
+              <Trash2 className="w-3.5 h-3.5" />
             </button>
           )}
 
           <button
             onClick={handleComplete}
             disabled={quest.completed || isCompleting}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold transition-all ${
               quest.completed
-                ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 cursor-default'
+                ? 'bg-emerald-950/60 text-emerald-400 border border-emerald-500/40 rounded-sm cursor-default'
                 : 'theme-button-primary'
             }`}
           >
             {quest.completed ? (
               <>
-                <CheckCircle2 className="w-4 h-4" />
-                <span>Completed</span>
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                <span>CLEARED</span>
               </>
             ) : (
               <>
-                <Circle className="w-4 h-4 stroke-[2.5]" />
-                <span>Complete</span>
+                <Circle className="w-3.5 h-3.5 stroke-[2.5]" />
+                <span>CLAIM</span>
               </>
             )}
           </button>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTheme } from './context/ThemeContext';
+import { THEMES, THEME_CONFIGS } from './themes/definitions';
 import { Navbar } from './components/shared/Navbar';
 import { ParticleCanvas } from './components/shared/ParticleCanvas';
 import { ThemeSelector } from './components/shared/ThemeSelector';
@@ -9,18 +10,19 @@ import { CharacterView } from './components/views/CharacterView';
 import { BossView } from './components/views/BossView';
 import { SkillTreeView } from './components/views/SkillTreeView';
 import { WorldProgressView } from './components/views/WorldProgressView';
+import { JourneyView } from './components/views/JourneyView';
 import { LandingPage } from './components/views/LandingPage';
 import { QuestModal } from './components/views/QuestModal';
 import { Modal } from './components/shared/Modal';
 import { characterService } from './services/characterService';
 import { questService } from './services/questService';
 import { bossService } from './services/bossService';
-import { sound } from './utils/soundEffects';
+import { sound, audioEngine } from './utils/soundEffects';
 import confetti from 'canvas-confetti';
-import { Award, Zap, Coins, Gem, Sparkles } from 'lucide-react';
+import { Award, Zap, Coins, Gem, Sparkles, Sword, Building2, Check } from 'lucide-react';
 
 export function App() {
-  const { currentTheme, themeConfig, isTransitioning } = useTheme();
+  const { currentTheme, themeConfig, switchTheme, isTransitioning } = useTheme();
 
   const [activeTab, setActiveTab] = useState('dashboard');
   const [character, setCharacter] = useState(null);
@@ -32,6 +34,7 @@ export function App() {
   const [isThemeSelectorOpen, setIsThemeSelectorOpen] = useState(false);
   const [isCreateQuestOpen, setIsCreateQuestOpen] = useState(false);
   const [levelUpData, setLevelUpData] = useState(null);
+  const [unlockedThemeAlert, setUnlockedThemeAlert] = useState(null);
 
   // Load authoritative state
   const reloadState = async () => {
@@ -60,6 +63,7 @@ export function App() {
   // Authoritative quest completion
   const handleCompleteQuest = async (questId) => {
     try {
+      const prevLevel = character?.level || 1;
       const res = await questService.completeQuest(questId, currentTheme);
       if (res && res.success) {
         // Update state
@@ -72,6 +76,7 @@ export function App() {
 
         // Level Up Trigger
         if (res.rewards?.leveledUp) {
+          const newLevel = res.rewards.newLevel;
           sound.playLevelUp();
           confetti({
             particleCount: 100,
@@ -79,6 +84,21 @@ export function App() {
             origin: { y: 0.5 }
           });
           setLevelUpData(res.rewards);
+
+          // Check for Level-gated Theme Unlocks!
+          if (newLevel >= 3 && prevLevel < 3) {
+            setUnlockedThemeAlert({
+              id: THEMES.SAMURAI,
+              ...THEME_CONFIGS[THEMES.SAMURAI],
+              level: 3
+            });
+          } else if (newLevel >= 5 && prevLevel < 5) {
+            setUnlockedThemeAlert({
+              id: THEMES.CITY,
+              ...THEME_CONFIGS[THEMES.CITY],
+              level: 5
+            });
+          }
         }
       }
     } catch (err) {
@@ -157,6 +177,13 @@ export function App() {
           />
         )}
 
+        {activeTab === 'journey' && (
+          <JourneyView
+            character={character}
+            onSwitchTheme={(themeId) => switchTheme(themeId)}
+          />
+        )}
+
         {activeTab === 'quests' && (
           <QuestBoardView
             quests={quests}
@@ -204,10 +231,11 @@ export function App() {
         )}
       </main>
 
-      {/* Theme Matrix Modal */}
+      {/* Theme Matrix Modal with Level-Gating */}
       <ThemeSelector
         isOpen={isThemeSelectorOpen}
         onClose={() => setIsThemeSelectorOpen(false)}
+        playerLevel={character?.level || 1}
       />
 
       {/* Quick Quest Modal for Dashboard */}
@@ -255,6 +283,62 @@ export function App() {
             Claim Rewards & Continue
           </button>
         </div>
+      </Modal>
+
+      {/* New Theme Unlocked Celebration Modal */}
+      <Modal
+        isOpen={!!unlockedThemeAlert}
+        onClose={() => setUnlockedThemeAlert(null)}
+        title="🎉 NEW MASTER REALM UNLOCKED!"
+      >
+        {unlockedThemeAlert && (
+          <div className="text-center py-4 space-y-4">
+            <div className="w-16 h-16 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-300 mx-auto">
+              {unlockedThemeAlert.id === THEMES.SAMURAI ? (
+                <Sword className="w-8 h-8 text-red-400 animate-pulse" />
+              ) : (
+                <Building2 className="w-8 h-8 text-cyan-400 animate-pulse" />
+              )}
+            </div>
+
+            <div>
+              <span className="text-xs font-black uppercase tracking-widest text-amber-400 bg-amber-500/15 px-3 py-1 rounded-full border border-amber-500/30">
+                {unlockedThemeAlert.code} • LEVEL {unlockedThemeAlert.level} ACHIEVEMENT
+              </span>
+              <h3 className="text-2xl font-black text-white mt-2">
+                {unlockedThemeAlert.name}
+              </h3>
+              <p className="text-xs text-neutral-300 mt-1">
+                {unlockedThemeAlert.subtitle}
+              </p>
+            </div>
+
+            <div className="p-4 rounded-xl bg-black/40 border border-white/10 text-left text-xs space-y-2">
+              <div className="font-bold text-neutral-200">Unlocked Theme Features:</div>
+              <div className="text-neutral-400">• New Hero: {unlockedThemeAlert.hero.name} ({unlockedThemeAlert.hero.class})</div>
+              <div className="text-neutral-400">• New World Boss: {unlockedThemeAlert.boss.name}</div>
+              <div className="text-neutral-400">• World Progression: {unlockedThemeAlert.worldProgress.title}</div>
+            </div>
+
+            <div className="flex items-center gap-3 pt-2">
+              <button
+                onClick={() => setUnlockedThemeAlert(null)}
+                className="w-1/2 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-neutral-300 text-xs font-bold transition-all"
+              >
+                Keep Current Theme
+              </button>
+              <button
+                onClick={() => {
+                  switchTheme(unlockedThemeAlert.id);
+                  setUnlockedThemeAlert(null);
+                }}
+                className="theme-button-primary w-1/2 py-2.5 text-xs font-bold shadow-xl"
+              >
+                Enter New Realm Now!
+              </button>
+            </div>
+          </div>
+        )}
       </Modal>
 
       {/* Footer */}
